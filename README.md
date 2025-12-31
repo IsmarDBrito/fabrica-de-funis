@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Entendido. O conteúdo abaixo está limpo, sem ícones, pronto para ser colado no seu arquivo README.md.
 
-## Getting Started
+Markdown
 
-First, run the development server:
+# Fábrica de Funis - IA Sales Agent
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Este projeto é um sistema automatizado de vendas que utiliza Next.js no frontend para interação com o usuário e n8n como motor de automação e inteligência artificial.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Como Funciona
+1. Frontend: Um chat interativo construído em Next.js.
+2. Backend (API): Rota Next.js que encaminha mensagens para o n8n.
+3. Automação (n8n): 
+   - Recebe dados via Webhook.
+   - Processa a inteligência com AI Agent (OpenAI).
+   - Registra cada interação em tempo real no Google Sheets.
+   - Retorna a resposta da IA para o chat.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tecnologias Utilizadas
+- Next.js
+- n8n (Automação de Fluxo)
+- OpenAI GPT-4o-mini (Inteligência do Vendedor)
+- Google Sheets API (Banco de Dados de Leads)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estrutura do Repositório
+- /app: Código fonte do chat e rotas de API.
+- /n8n-workflow: Contém o arquivo .json para importar o fluxo de automação.
 
-## Learn More
+## Configuração
+1. Exporte seu workflow do n8n e salve na pasta /n8n-workflow.
+2. Configure as variáveis de ambiente no arquivo .env (não incluso no repositório por segurança).
+3. Certifique-se de que o n8n está rodando localmente na porta 5678.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Desenvolvido com foco em entender e resolver o desafio da automação de vendas.
