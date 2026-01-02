@@ -6,20 +6,36 @@ export default function ChatWidget({ slug }: { slug: string }) {
   const [input, setInput] = useState('')
 
   async function sendMessage() {
-    if (!input) return
-    const userMsg = { role: 'user', content: input }
-    setMessages([...messages, userMsg])
-    
-    // Chama a rota de API que você acabou de criar [cite: 18, 162]
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      body: JSON.stringify({ message: input, slug })
-    })
-    
-    const data = await res.json()
-    setMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
-    setInput('')
+  if (!input) return
+  
+  // 1. Recupera o Session ID do navegador (o crachá do cliente)
+  let sessionId = localStorage.getItem('chat_session_id')
+  if (!sessionId) {
+    sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`
+    localStorage.setItem('chat_session_id', sessionId)
   }
+
+  const userMsg = { role: 'user', content: input }
+  setMessages(prev => [...prev, userMsg])
+  
+  // 2. Envia para a API com o crachá (sessionId) e o mapa (slug)
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      message: input, 
+      slug, 
+      sessionId // Crucial para o Simple Memory no n8n
+    })
+  })
+  
+  const data = await res.json()
+  
+  // 3. Ajuste para capturar o campo 'output' ou 'reply' vindo do n8n
+  const aiReply = data.output || data.reply || 'Processando...'
+  setMessages(prev => [...prev, { role: 'assistant', content: aiReply }])
+  setInput('')
+}
 
   return (
     <div className="fixed bottom-5 right-5 w-80 bg-white border border-gray-300 shadow-2xl rounded-lg overflow-hidden z-50">
@@ -39,7 +55,7 @@ export default function ChatWidget({ slug }: { slug: string }) {
         ))}
       </div>
 
-      {/* Campo de Input (Onde estava o problema) */}
+      
       <div className="p-2 border-t border-gray-200 flex bg-white">
         <input 
           value={input} 
