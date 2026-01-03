@@ -1,39 +1,51 @@
-import { NextResponse } from 'next/server'
 
+import { NextResponse } from 'next/server';
+
+// No seu arquivo de rota (API Route)
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
-    
-    // 1. URL do seu Webhook (Verifique se é 'fabrica-de-funis' ou 'chat-vendas')
-   const N8N_WEBHOOK_URL = 'http://localhost:5678/webhook/chat-vendas'
+    const body = await req.json();
+    const urls = [
+      'http://localhost:5678/webhook-test/chat-vendas',
+      'http://localhost:5678/webhook/chat-vendas'
+    ];
 
-    // 2. Envia os dados incluindo o sessionId para o n8n separar a memória
-    const response = await fetch(N8N_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: body.message,
-        sessionId: body.sessionId, // ADICIONADO: O n8n precisa disso para o Simple Memory
-        slug: body.slug // Mantido caso você use para rastrear a página
-      })
-    })
+    let lastRes = null;
 
-    if (!response.ok) {
-      throw new Error('Erro ao falar com o n8n')
+    for (const url of urls) {
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: body.message,
+            sessionId: body.sessionId,
+            slug: body.slug
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          // Se conseguirmos o JSON do n8n, retornamos imediatamente
+          return NextResponse.json(data);
+        }
+        lastRes = res;
+      } catch (err) {
+        console.error(`Falha na URL ${url}:`, err);
+      }
     }
 
-    const data = await response.json()
-    
-    // 3. Devolve a resposta (Ajustado para 'output' que é o padrão do AI Agent)
-    return NextResponse.json({ 
-      output: data.output || data.reply || 'Estou processando sua dúvida...' 
-    })
+    // Se chegou aqui, as duas falharam. Retornamos um erro em formato JSON
+    return NextResponse.json(
+      { output: 'Não consegui conectar ao servidor n8n.' },
+      { status: 502 } // O status fica aqui, como segundo argumento
+    );
 
   } catch (error) {
-    console.error('Erro na rota de chat:', error)
+    console.error('Erro na rota:', error);
     return NextResponse.json(
-      { output: 'Ops, tive um problema técnico. Tente novamente em instantes.' },
-      { status: 500 }
-    )
+      { output: 'Erro interno no servidor.' },
+      { status: 500 } // O status fica aqui também
+    );
   }
 }
